@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Todo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+    @layer utilities {
+      @variants responsive {
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      .no-scrollbar::-webkit-scrollbar {
+          display: none;
+      }
+
+      .no-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+      }
+
+      .break-anywhere {
+            line-break: anywhere;
+            font-size: 12px;
+             width: 70%;
+        }
+    }
+    }
+  </style>
+  </head>
+  <body class="bg-[#f1fefd] flex flex-col justify-center items-center min-h-screen">
+
+    <h1 class="relative top-[3rem] right-[3px] text-[13vh]">TODOS</h1>
+   
+  <div class="w-full flex justify-center">
+    <div class="bg-[#e5f2f1] absolute p-8 py-2 shadow-lg  rounded w-2/3 md:w-1/4 flex  justify-between items-center">
+      <input type="text" placeholder="Hit your todo's" id="inputData" class="bg-transparent  text-3xl w-full outline-none py-[10px] pl-[5px] text-xs" value="">
+    </div>
+
+    <!-- list section -->
+   <div id="listed" class="overflow-y-scroll  no-scrollbar max-h-[43vh] flex mt-[27%] md:mt-[7%] flex-col w-full  items-center">
+   
+   </div>
+  </div>
+
+  <div id="modal" class="text-white flex justify-center flex-col items-center absolute top-0 bg-[#4b8b6d] p-8 py-4 shadow-lg  w-2/3 md:w-1/4 hidden">
+    <p class="w-full text-xs text-center">Want to mark as completed ?</p>
+    <i class="fa-solid fa-check cursor-pointer"></i>
+  </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
