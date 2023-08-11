@@ -1,6 +1,6 @@
 const TodoArr = localStorage.getItem("items") ? JSON.parse(localStorage.getItem("items")) : []
 
-console.log(TodoArr)
+// console.log(TodoArr)
 
 const input = document.querySelector("#inputData")
 
@@ -34,8 +34,6 @@ const display = () => {
     )
   })
   lists.innerHTML = storedItem.join('')
-
-
 }
 
 display()
@@ -55,22 +53,7 @@ const remove = () => {
 
 remove()
 
-// let popInputs = document.querySelectorAll(".popup-input");
-// console.log(popInputs)
 let modal = document.querySelector("#modal")
-// console.log(modal)
-
-// popInputs.forEach((pop) => {
-//   pop.addEventListener("click", () => {
-//     modal.style.display = "flex"
-//     // alert("working")
-//   })
-// })
-
-// let back = document.querySelector("#back")
-// back.addEventListener("click", () => {
-//   modal.style.display = "none"
-// })
 
 const editt = () => {
   let update = document.querySelectorAll("#edit");
@@ -111,7 +94,6 @@ const editt = () => {
             // Update local storage
             localStorage.setItem("items", JSON.stringify(TodoArr));
             location.reload()
-          
         }
       });
     });
