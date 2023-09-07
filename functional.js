@@ -13,7 +13,8 @@ const formInput = () => {
 
     todoInput.addEventListener("keydown", (e) => {
         if(e.key == "Enter") {
-         TodoArr.unshift(todoInput.value)
+          // Side effect here updating global variable
+         TodoArr.unshift(todoInput.value) 
          localStorage.setItem("items", JSON.stringify(TodoArr))
         //  localStorage.clear()
           location.reload()
@@ -44,6 +45,7 @@ const displayData = () => {
 }
 const removeData = () => {
     const remove = getMultiple("#dust")
+    console.log(remove)
 
     remove.forEach((t,i) => {
         t.addEventListener("click", () => {
@@ -60,7 +62,7 @@ const enterEvent = (itemText) => {
         if (e.key == "Enter") {
 
           const index = TodoArr.indexOf(itemText);
-   
+          // Side effect here updating global varibale
             TodoArr[index] = up.value;
 
             localStorage.setItem("items", JSON.stringify(TodoArr));
