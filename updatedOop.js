@@ -9,101 +9,148 @@ class LocallyStored {
     }
 }
 
-class TodoData {
+
+class DomElements {
     constructor() {
         this.input = document.querySelector("#inputData")
-        this.input.addEventListener("keydown", this.addTodo.bind(this))
         this.modal = document.querySelector("#modal")
+        this.todoData = new TodoData()
+        this.input.addEventListener("keydown", (e) => {
+            todoUi.AddingTodo(e)
+        })
+        this.oldValue = ""
         
     }
 
-    addTodo(e) {
-        if(e.key == "Enter") {
-            const localData = new LocallyStored()
-            const inputData = this.input.value
-            const TodoArr = localData.getData("items")
-            TodoArr.unshift(inputData)
-            localData.StoreData("items", TodoArr)
-            location.reload()
-        }
-    }   
-
-
-
-    editTodo(TodoArr) {
-            
-            this.update = document.querySelectorAll(".edit");
-
-            this.update.forEach((e,i) => {
-                // Add event listener to each todo
-                e.addEventListener("click", () => {
-                    let itemText = e.parentNode.parentNode.querySelector(".popup-input").textContent;
-              
-                    this.modal.innerHTML = '';
-              
-                    const content = `
-                      <p class="w-full text-xs text-left">This is your editspace</p>
-                      <div>
-                      <input id="up" type="text" class="text-sm mt-2 outline-none bg-transparent" value="${itemText}">
-                      </div>
-                      <div id="back" class="absolute top-0 right-0 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></div>
-                    `;
-                    this.modal.insertAdjacentHTML('beforeend', content);
-              
-                    this.modal.style.display = "flex";
-              
-                    let back = document.querySelector("#back");
-              
-                    back.addEventListener("click", () => {
-                        this.modal.style.display = "none";
-                    });
-              
-                    let up = document.querySelector("#up");
-          
-                    up.addEventListener("keydown", (e) => {
-                      if (e.key == "Enter") {
-                        const index = TodoArr.indexOf(itemText);
-
-                        
-                          TodoArr[index] = up.value;
-                          const localData = new LocallyStored();
-                          localData.StoreData("items", TodoArr);
-                          todoUi.loadTodos();
-                          this.modal.style.display = "none";
-                        
-                      }
-                    });
-                });
-            });
-        }
-
-    deleteTodo(TodoArr) {
-         this.rmv =  document.querySelectorAll("#dust")
-           this.rmv.forEach((t,i) => {
-            t.addEventListener("click", () => {
-              TodoArr.splice(i,1)
-                const localData = new LocallyStored();
-                localData.StoreData("items", TodoArr);
-             
-              todoUi.loadTodos()
-            
-            })
-          })
+    Input() {
+     return this.input.value 
+    }
+    EditTodo(){
+        return document.querySelectorAll(".edit");
     }
 
+    EditListener() {
+        const pens = this.EditTodo();
 
+        pens.forEach((pen, index) => {
+            pen.addEventListener("click", () => {
+            const todoArr = this.todoData.todoArray
+            this.oldValue = todoArr[index]
+            todoUi.EditTodo(index, todoArr)
+               
+            });
+        });
+    }
+
+    displayModal() {
+        
+        this.modal.style.display = "flex";
+         
+    }
+
+    Editinput() {
+        return document.querySelector("#up")
+    }
+
+    SetModal(todoText) {
+        this.modal.innerHTML = todoText;
+    }
+
+    CloseModal() {
+        this.modal.style.display = "none";
+    }
+    popup(elem) {
+        return elem.parentNode.parentNode.querySelector(".popup-input").textContent;
+    }
+
+    deleteTodo() {
+        return  document.querySelectorAll("#dust")
+    }
+
+    todoLists() {
+        return  document.querySelector("#listed");
+    }
+    clearInput() {
+        return this.input.value = ""
+    }
+    back() {
+        let back = document.querySelector("#back")
+        back.addEventListener("click", () => {
+            return this.CloseModal()
+        })
+    }
+
+    EditText() {
+        return this.Editinput().value
+    }
+
+    
 }
+
+
+
+class TodoData {
+    constructor() {
+        // this.todoData = new DomElements()
+        this.localdata = new LocallyStored()
+        this.todoArray = []
+    }
+
+    addTodo(todo) {
+        this.todoArray.unshift(todo)
+    }  
+    
+
+
+
+    editTodo(oldValue, newValue) {
+           const todoIndex = this.todoArray.indexOf(oldValue)
+           if(todoIndex !== -1) {
+                this.todoArray[todoIndex] = newValue    
+           }
+       }
+
+    deleteTodo(todo) {
+        const todoIndex = this.todoArray.indexOf(todo)
+        if(todoIndex !== -1) {
+           this.todoArray.splice(todoIndex,1)
+        }
+    }
+
+    
+}
+
+
+
 
 
 class TodoUI {
     constructor() {
-        this.lists = document.querySelector("#listed");
-        this.loadTodos();
+        this.inputDom = new DomElements();
+        this.localdata = new LocallyStored();
+        this.todoData = new TodoData();
+        this.todoData.todoArray = this.localdata.getData("items") || [];
+        this.DisplayTodo();
     }
 
-    displayTodo (TodoArr) {
-        if(Array.isArray(TodoArr)) {
-            let storedItem = TodoArr.map((i) => {
+  
+
+    AddingTodo(e) {
+        if(e.key === "Enter") {
+          const input = this.inputDom.Input() 
+          this.todoData.addTodo(input)
+          const data = this.todoData.todoArray
+          this.localdata.StoreData("items", data)
+          this.inputDom.clearInput()
+          this.DisplayTodo()
+        }
+    }
+
+    DisplayTodo() {
+         let lists = this.inputDom.todoLists()
+
+         if(Array.isArray(this.todoData.todoArray)) {
+            let storedItem = this.todoData.todoArray.map((i) => {
                 return(
                     `
                     <div class="p-8  md:mt-0 py-6  border-r-4  shadow-lg border-l-4 border-[#4b8b6d] rounded w-2/3 md:w-1/4 flex  justify-between items-center">
@@ -119,24 +166,62 @@ class TodoUI {
                 )
             });
 
-            this.lists.innerHTML = storedItem.join('');
-            todoData.editTodo(TodoArr);
-            todoData.deleteTodo(TodoArr)
+            lists.innerHTML = storedItem.join('');
+           
+            this.inputDom.EditListener();
+
+            this.inputDom.deleteTodo().forEach((d,i) => {
+                d.addEventListener("click", () => {
+                    this.DeleteTodo(i)
+                })
+            }) 
         }
     }
 
-    loadTodos() {
-        const local = new LocallyStored();    
-        const TodoArr = local.getData("items");
-        this.displayTodo(TodoArr);
-    }        
+    EditTodo(i, todoArray) {
+      console.log("todoArray:", todoArray)
+        let itemText = todoArray[i]
+        console.log("itemText:", itemText)
+        const content = `
+             <p class="w-full text-xs text-left">This is your editspace</p>
+                <div>
+                    <input id="up" type="text" class="text-sm mt-2 outline-none bg-transparent" value="${itemText}">
+                </div>
+            <div id="back" class="absolute top-0 right-0 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></div>            
+        `
+
+        this.inputDom.SetModal(content)
+        this.inputDom.displayModal()
+
+        this.inputDom.back()
+
+        let up = this.inputDom.Editinput()
+        up.addEventListener("keydown", (e) => {
+            if(e.key === "Enter") {
+                const editValue = this.inputDom.EditText()
+                console.log("ediValue:",editValue)
+                this.todoData.editTodo(itemText, editValue)
+                this.inputDom.CloseModal()
+                this.DisplayTodo()
+            }
+        })
+
+        
+             
+    }
+
+    DeleteTodo(index) {
+        this.todoData.deleteTodo(this.todoData.todoArray[index]);
+        const data = this.todoData.todoArray;
+        this.inputDom.clearInput();
+        this.DisplayTodo();
+        this.localdata.StoreData("items", data);
+    }
+
+
+ 
 }
 
 
-
-const LocallyStore = new LocallyStored()
-const todoData = new TodoData()
 const todoUi = new TodoUI()
-
-todoUi.loadTodos()
 
