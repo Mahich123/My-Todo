@@ -1,4 +1,4 @@
-// Separate Function for localStorage
+// LOCAL STORAGE
 
 const localStore = (key,data) => {
     if(data !== undefined) {
@@ -8,33 +8,58 @@ const localStore = (key,data) => {
     return storedData ?  JSON.parse((storedData)) : [];
 }
 
+// DOM PART
+
 const getInput = (inputId) => {
-    return document.getElementById(inputId)
+  return document.getElementById(inputId)
 }
 
 const getMultiple = (inputId) => {
-    return document.querySelectorAll(inputId)
+  return document.querySelectorAll(inputId)
 }
+
+const formEvent = (input, newvalue) => {
+  input.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") {
+          newvalue(input.value)
+      }
+  })
+}
+
+const modalEvent = (data, update) => {
+  data.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") {
+          update(data.value)
+          modal.style.display = "none"
+      }
+  })
+}
+
+const modalClose = (back, modal) => {
+  back.addEventListener("click", () => {
+      modal.style.display = "none"
+  })
+}
+
+
+// SIDE EFFECTS
 
 const formInput = () => {
     const todoInput = getInput("inputData")
-    todoInput.addEventListener("keydown", (e) => {
-      if(e.key == "Enter") {
-        const prevItem = Array.from(localStore('items'))
-        const newItem = todoInput.value
-        prevItem.unshift(newItem)
+    formEvent(todoInput, (t) => {
+        const prevItem = Array.from(localStore("items"))
+        prevItem.unshift(t)
+        localStore("items", prevItem)
         
-        localStore("items", prevItem )
-        location.reload()
-      } 
+        displayData()
+
+        todoInput.value = ""
     })
 }
 
 const displayData = () => {
     const lists = getInput("listed")
     let storedData = localStore("items").map((i) => { 
-        // console.log(i)
-
         return(
             `
             <div class="p-8  md:mt-0 py-6  border-r-4  shadow-lg border-l-4 border-[#4b8b6d] rounded w-2/3 md:w-1/4 flex  justify-between items-center">
@@ -55,6 +80,7 @@ const displayData = () => {
     editTodo()
 }
 
+
 const removeData = () => {
     const remove = getMultiple("#dust")
     
@@ -68,79 +94,67 @@ const removeData = () => {
     }) 
 }
 
-const enterEvent = (text) => {
+
+
+const updateValue = (text) => {
   let up = getInput("up")
-  up.addEventListener("keydown", (e) => {
-    if(e.key == "Enter") {
-      let todoData = localStore("items");
-      const index = localStore("items").indexOf(text);
-      todoData[index] = up.value;
-      localStore("items", todoData)
-      location.reload()
-    }
+  modalEvent(up, () => {
+    let todoData = localStore("items")
+    const index = localStore("items").indexOf(text)
+    todoData[index] = up.value
+    localStore("items", todoData)
+    displayData()
+    modalOff()
   })
 }
 
-
-
-
-
-const clickEvent = () => {
-  const modal = getInput('modal')
-  let back = getInput("back")
-  back.addEventListener("click" , () => {
-    modal.style.display = "none";
-  })
-
+const modalOff = () => {
+    const modal = getInput("modal")
+    let back = getInput("back")
+    modalClose(back, modal)
 }
 
+const modalOpen = (modal, content) => {
+    modal.innerHTML = ``;
+    modal.insertAdjacentHTML('beforeend', content);
+    modal.style.display = "flex"
+    modalOff()
+}
+
+const editHandler = (edit) => {
+     const todotText = edit.parentNode.parentNode.querySelector(".popup-input").textContent;
+     const modal = getInput("modal")
+
+     const content = `
+     <p class="w-full text-xs text-left">This is your editspace</p>
+      <div>
+         <input id="up" type="text" class="text-sm mt-2 outline-none bg-transparent" value="${todotText}">
+     </div>
+     <div id="back" class="absolute top-0 right-0 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></div>
+  `;
+
+     modalOpen(modal, content)
+   
+     updateValue(todotText)
+     
+}
 
 
 const editTodo = () => {
-   const modal = getInput("modal")
+    const editBtns = getMultiple("#edit");
+    Array.from(editBtns).map((edit) => {
+        edit.addEventListener("click", () => {
+            editHandler(edit);      
+        });
+    });
+};
 
-    const update = getMultiple("#edit")
-    // console.log(update)
-    Array.from(update).map((e) => {
-      e.addEventListener("click", () => {
-        let todotText = e.parentNode.parentNode.querySelector(".popup-input").textContent;
 
-        modal.innerHTML = ``;
 
-        const content = `
-          <p class="w-full text-xs text-left">This is your editspace</p>
-              <div>
-              <input id="up" type="text" class="text-sm mt-2 outline-none bg-transparent" value="${todotText}">
-              </div>
-              <div id="back" class="absolute top-0 right-0 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></div>
-        `;
 
-        modal.insertAdjacentHTML('beforeend', content);
-        modal.style.display = "flex"
-
-        clickEvent()
-
-        enterEvent(todotText)
-      })
-    })
-}
-
-editTodo()
-// console.log(removeData())
-removeData()
-displayData()
 formInput()
+displayData()
+removeData()
 localStore("items")
-
-
-
-
-
-
-
-
-
-
-
 
 
