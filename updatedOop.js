@@ -83,36 +83,55 @@ class TodoUI {
           this.DisplayTodo()
         }
     }
+    
+     createTodoElement(todoText) {
+        const todoElement = document.createElement("div")
+        todoElement.className = "p-8  md:mt-0 py-6  border-r-4  shadow-lg border-l-4 border-[#4b8b6d] rounded w-2/3 md:w-1/4 flex  justify-between items-center"
+
+        const popupDiv = document.createElement("div")
+        popupDiv.className = "cursor-pointer popup-input break-anywhere"
+        popupDiv.textContent = todoText
+        todoElement.appendChild(popupDiv)
+
+        const actionDiv = document.createElement("div")
+        actionDiv.className = "flex items-center gap-2"
+
+        const dustDiv = document.createElement("div")
+        dustDiv.id = "dust"
+        const trashIcon = document.createElement("i")
+        trashIcon.className = "fa-solid fa-trash cursor-pointer"
+        dustDiv.appendChild(trashIcon)
+        actionDiv.appendChild(dustDiv)
+
+        const editIcon = document.createElement("i")
+        editIcon.className = "edit fa-solid fa-pen-to-square cursor-pointer"
+        actionDiv.appendChild(editIcon)
+
+        todoElement.appendChild(actionDiv)
+
+        return todoElement
+    }
 
     DisplayTodo() {
-         let lists = this.lists
+        let lists = this.lists
 
-         if(Array.isArray(this.todoData.todoArray)) {
-            let storedItem = this.todoData.todoArray.map((i) => {
-                return(
-                    `
-                    <div class="p-8  md:mt-0 py-6  border-r-4  shadow-lg border-l-4 border-[#4b8b6d] rounded w-2/3 md:w-1/4 flex  justify-between items-center">
-                    <div class="cursor-pointer popup-input break-anywhere ">${i}</div>
-                    <div class="flex items-center gap-2">
-                    <div id="dust">
-                        <i class="fa-solid fa-trash cursor-pointer "></i>
-                    </div>
-                        <i class="edit fa-solid fa-pen-to-square cursor-pointer"></i>
-                    </div>
-                    </div>
-                    `
-                )
-            });
+        if (Array.isArray(this.todoData.todoArray)) {
+            while (lists.firstChild) {
+                lists.removeChild(lists.firstChild)
+            }
 
-            lists.innerHTML = storedItem.join('');
-           
-            this.EditListener();
+            this.todoData.todoArray.forEach((i) => {
+                const todoElement = this.createTodoElement(i)
+                lists.appendChild(todoElement)
+            })
 
-            this.deleteTodo().forEach((d,i) => {
+            this.EditListener()
+
+            this.deleteTodo().forEach((d, i) => {
                 d.addEventListener("click", () => {
                     this.DeleteTodo(i)
                 })
-            }) 
+            })
         }
     }
 
@@ -185,7 +204,10 @@ class TodoUI {
     }
 
     SetModal(todoText) {
-        this.modal.innerHTML = todoText;
+        while (this.modal.firstChild) {
+            this.modal.removeChild(this.modal.firstChild)
+        }
+        this.modal.appendChild(document.createTextNode(todoText))
     }
 
     CloseModal() {
