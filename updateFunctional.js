@@ -1,3 +1,4 @@
+
 // LOCAL STORAGE
 
 const localStore = (key, data) => {
@@ -9,150 +10,141 @@ const localStore = (key, data) => {
 }
 
 const getMultiple = (inputId) => {
-  return document.querySelectorAll(inputId)
+    return document.querySelectorAll(inputId)
+  }
+  
+  const getInput = (inputId) => {
+    return document.getElementById(inputId)
+  }
+
+// CREATE 
+const create = (items, newItem) => {
+    const updateTodo = [...items, newItem]
+    return updateTodo
 }
 
-const getInput = (inputId) => {
-  return document.getElementById(inputId)
+// READ
+const read = () => {
+    return localStore("items")
 }
 
-const formValue = (input) => {
-  return input.value
+// UPDATE
+const update = (items, index, newVal) => {
+    const todo = [...items]
+    todo[index] = newVal 
+    return todo
+}
+
+// DELETE
+const remove = (items, i) => {
+    const todos = [...items]
+    todos.splice(i,1)
+    return todos
+}
+
+// LIST
+const list = () => {
+    let storedData = read().map((i) => { return i});
+    return storedData
 }
 
 
+// side effects
 
-const formEvent = (input, callback) => {
-  input.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") {
-          callback()
-      }
-  })
-}
+// const displayContent = () => {
+  
+//     return(
+//             `
+//         <div class="p-8  md:mt-0 py-6  border-r-4  shadow-lg border-l-4 border-[#4b8b6d] rounded w-2/3 md:w-1/4 flex  justify-between items-center">
+//         <div class="cursor-pointer popup-input break-anywhere ">${i}</div>
+//         <div class="flex items-center gap-2">
+//         <div id="dust">
+//             <i class="fa-solid fa-trash cursor-pointer "></i>
+//         </div>
+//             <i id="edit" class="fa-solid fa-pen-to-square cursor-pointer"></i>
+//         </div>
+//         </div>
+//             `
+//     )
+    
+// }
 
-
-const formSubmit = () => {
-  const input = getInput("inputData")
-  formEvent(input, () => {
-    const prevItem = Array.from(localStore('items'))
-    const newItem = formValue(input)
-    prevItem.unshift(newItem)
-    localStore("items", prevItem )
-    input.value = ""
-    updateData()
-  })
-}
- 
 const displayContent = () => {
-  // const lists = getInput("listed")
-  let storedData = localStore("items").map((i) => {
-      return(
-          `
-          <div class="p-8  md:mt-0 py-6  border-r-4  shadow-lg border-l-4 border-[#4b8b6d] rounded w-2/3 md:w-1/4 flex  justify-between items-center">
-          <div class="cursor-pointer popup-input break-anywhere ">${i}</div>
-         <div class="flex items-center gap-2">
-         <div id="dust">
-           <i class="fa-solid fa-trash cursor-pointer "></i>
-         </div>
-           <i id="edit" class="fa-solid fa-pen-to-square cursor-pointer"></i>
-         </div>
+    return list().map(i => {
+        return `
+        <div class="p-8  md:mt-0 py-6  border-r-4  shadow-lg border-l-4 border-[#4b8b6d] rounded w-2/3 md:w-1/4 flex  justify-between items-center">
+        <div class="cursor-pointer popup-input break-anywhere ">${i}</div>
+        <div class="flex items-center gap-2">
+        <div id="dust">
+            <i class="fa-solid fa-trash cursor-pointer "></i>
         </div>
-          `
-      )
-  })
-
-  return storedData.join('')
+            <i id="edit" class="fa-solid fa-pen-to-square cursor-pointer"></i>
+        </div>
+        </div>
+        `;
+    }).join("");
 }
-
 
 const displayData = () => {
-  const lists = getInput("listed")
-  const storedTodo = displayContent()
-  lists.innerHTML = storedTodo 
-  removeData()
-  editTodo()
-}
-
-
-const remove = (i) => {
-  const prevData = localStore("items")
-  prevData.splice(i,1)
-  localStore("items", prevData)
-  updateData()
-}
-
-const removeData = () => {
-  const dustbtn = getMultiple("#dust")
-  Array.from(dustbtn).map((e,i) => {
-      e.addEventListener("click", () => {
-          remove(i)
-      })
-  })
-}
-
-const updateData = () => {
-  const localData = localStore("items")
-  displayData(localData)
-}
-
-const modalData = (index,newval) => {
-  let todoData = localStore("items")
-  todoData[index] = newval
-  localStore("items", todoData)
-  return todoData
+    const lists = getInput("listed")
+    const storedTodo = displayContent()
+    lists.innerHTML = storedTodo
+    removeData()
+    editTodo()
 }
 
 const enterEvent = (text) => {
-  let up = getInput("up")
-  up.addEventListener("keydown", (e) => {
+    let up = getInput("up")
+    up.addEventListener("keydown", (e) => {
       if(e.key === "Enter") {
-          const index = localStore("items").indexOf(text)
-          const updateTodo = modalData(index, up.value)   
-          localStore("items", updateTodo)
-          modalClose(getInput("modal")) // Close the modal
-          updateData()
+        const data = read() 
+        const index = data.indexOf(text)
+        const newTodo = up.value
+        const updtedData = update(data,index,newTodo)
+        localStore("items", updtedData)
+        modalClose(getInput("modal"))
+        updateData()
       }
-  })
+    })
 }
 
-
-const clickEvent = () => {
-  const modal = getInput('modal')
-  let back = getInput("back")
-  back.addEventListener("click" , () => {
-      modalClose(modal)
-  })
-}
-
-
-const modalContent = (text) => {
-  return `
-      <p class="w-full text-xs text-left">This is your editspace</p>
-          <div>
-          <input id="up" type="text" class="text-sm mt-2 outline-none bg-transparent" value="${text}">
-          </div>
-          <div id="back" class="absolute top-0 right-0 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></div>
-  `;
-}
-
-const editTodo = () => {
- const modal = getInput("modal")
- const edit = getMultiple("#edit")
-  Array.from(edit).map((e) => {
-      e.addEventListener("click", () => {
-          let todotText = e.parentNode.parentNode.querySelector(".popup-input").textContent;
-          const modalText = modalContent(todotText)
-          modalOpen(modal,modalText)
-          enterEvent(todotText)
-      })
-  })
-}
+const updateData = () => {
+    const localData = read()
+    displayData(localData)
+  }
+  
+  const modalData = (index,newval) => {
+    let todoData = read()
+    todoData[index] = newval
+    localStore("items", todoData)
+    return todoData
+  }
 
 
-const modalOpen = (modal, content) => {
-  modal.innerHTML = content
-  modal.style.display = "flex"
-  clickEvent()
+  const clickEvent = () => {
+    const modal = getInput('modal')
+    let back = getInput("back")
+    back.addEventListener("click" , () => {
+        modalClose(modal)
+    })
+  }
+
+  
+  const modalContent = (text) => {
+    return `
+        <p class="w-full text-xs text-left">This is your editspace</p>
+            <div>
+            <input id="up" type="text" class="text-sm mt-2 outline-none bg-transparent" value="${text}">
+            </div>
+            <div id="back" class="absolute top-0 right-0 cursor-pointer"><i class="fa-solid fa-arrow-left"></i></div>
+    `;
+  }
+  
+
+  const modalOpen = (modal, content) => {
+    modal.innerHTML = content
+    modal.style.display = "flex"
+    clickEvent()
 }
 
 
@@ -161,13 +153,57 @@ const modalClose = (modal) => {
       modal.style.display = "none";
   }
 }
+  const editTodo = () => {
+   const modal = getInput("modal")
+   const edit = getMultiple("#edit")
+    Array.from(edit).map((e) => {
+        e.addEventListener("click", () => {
+            let todotText = e.parentNode.parentNode.querySelector(".popup-input").textContent;
+            const modalText = modalContent(todotText)
+            modalOpen(modal,modalText)
+            enterEvent(todotText)
+        })
+    })
+  }
 
+const removeData = () => {
+    const dustbtn = getMultiple("#dust")
+    Array.from(dustbtn).map((e,i) => {
+        e.addEventListener("click", () => {
+           const updatedTodos = remove(localStore("items"), i)
+            localStore("items", updatedTodos)
+            updateData()
+        })
+    })
+  }
+
+const formValue = (input) => {
+    return input.value
+  }
+  
+  const formSubmit = () => {
+      const input = getInput("inputData")
+      
+      formEvent(input, () => {
+        const newItem = formValue(input)
+        const updateTodo = create(read(), newItem)
+        updateTodo.unshift(newItem)
+        localStore("items", updateTodo)
+        input.value = ""
+        updateData()
+  })
+    }
+
+    const formEvent = (input, callback) => {
+    input.addEventListener("keydown", (e) => {
+        if(e.key === "Enter") {
+            callback()
+        }
+    })
+  }
 
 displayData();
 formSubmit();
 removeData();
 editTodo();
 localStore("items");    
-
-
-
