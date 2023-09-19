@@ -51,24 +51,6 @@ const list = () => {
 
 // side effects
 
-// const displayContent = () => {
-  
-//     return(
-//             `
-//         <div class="p-8  md:mt-0 py-6  border-r-4  shadow-lg border-l-4 border-[#4b8b6d] rounded w-2/3 md:w-1/4 flex  justify-between items-center">
-//         <div class="cursor-pointer popup-input break-anywhere ">${i}</div>
-//         <div class="flex items-center gap-2">
-//         <div id="dust">
-//             <i class="fa-solid fa-trash cursor-pointer "></i>
-//         </div>
-//             <i id="edit" class="fa-solid fa-pen-to-square cursor-pointer"></i>
-//         </div>
-//         </div>
-//             `
-//     )
-    
-// }
-
 const displayContent = () => {
     return list().map(i => {
         return `
